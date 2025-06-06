@@ -46,6 +46,8 @@ const Quiz = () => {
             options: options,
             correct_answer: item.author,
             correct_id: item.id,
+            caption: item.caption,
+            date: item.date,
             option_ids: options.map(opt => {
               const matchingItem = data.find(d => d.author === opt);
               return matchingItem ? matchingItem.id : null;
@@ -98,9 +100,9 @@ const Quiz = () => {
   if (showScore) {
     return (
       <div className="score-section">
-        <h2>Quiz completed!</h2>
-        <p>You scored {score} out of {questions.length}</p>
-        <button onClick={resetQuiz}>Restart Quiz</button>
+        <h2>Тест завершен!</h2>
+        <p>Вы набрали {score} из {questions.length}</p>
+        <button onClick={resetQuiz}>Перезапустить тест</button>
       </div>
     );
   }
@@ -114,7 +116,7 @@ const Quiz = () => {
     <div className="quiz-container">
       <div className="question-section">
         <div className="question-count">
-          <span>Question {currentQuestion + 1}</span>/{questions.length}
+          <span>Вопрос {currentQuestion + 1}</span>/{questions.length}
         </div>
         <div className="question-image">
           <img 
@@ -144,16 +146,23 @@ const Quiz = () => {
             disabled={selectedAnswer !== null}
           >
             {option}
-             {/* (ID: {currentQuestionData.option_ids[index]}) */}
           </button>
         ))}
         {selectedAnswer !== null && (
-          <button 
-            className="continue-button"
-            onClick={handleContinue}
-          >
-            Продолжить
-          </button>
+          <>
+            {selectedAnswer === currentQuestionData.correct_answer && (
+              <div className="correct-answer-info">
+                <p>Название: {currentQuestionData.caption}</p>
+                <p>Датировка: {currentQuestionData.date}</p>
+              </div>
+            )}
+            <button 
+              className="continue-button"
+              onClick={handleContinue}
+            >
+              Продолжить
+            </button>
+          </>
         )}
       </div>
     </div>
