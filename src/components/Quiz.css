@@ -12,9 +12,11 @@
 }
 
 .question-count {
-  font-size: 18px;
-  color: black;
-  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  color: #dbdbdb;
 }
 
 .question-image {
@@ -82,13 +84,13 @@
 
 .score-section h2 {
   font-size: 24px;
-  color: #333;
+  color: #ffffff;
   margin-bottom: 10px;
 }
 
 .score-section p {
   font-size: 18px;
-  color: #666;
+  color: #ececec;
   margin-bottom: 20px;
 }
 
@@ -130,16 +132,92 @@
   background-color: #45a049;
 }
 
-.correct-answer-info {
+.answer-info {
   margin: 20px 0;
   padding: 15px;
-  background-color: #e8f5e9;
   border-radius: 5px;
-  border: 1px solid #4caf50;
+  border: 1px solid;
 }
 
-.correct-answer-info p {
+.answer-info.correct {
+  background-color: #e8f5e9;
+  border-color: #4caf50;
+}
+
+.answer-info.incorrect {
+  background-color: #ffebee;
+  border-color: #f44336;
+}
+
+.answer-info p {
   margin: 5px 0;
-  color: #2e7d32;
   font-size: 16px;
+}
+
+.answer-info.correct p {
+  color: #2e7d32;
+}
+
+.answer-info.incorrect p {
+  color: #c62828;
+}
+
+.quiz-footer {
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px solid #ddd;
+  text-align: center;
+}
+
+.quiz-footer p {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.report-button {
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  margin: 10px 0;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.report-button:hover {
+  background-color: #ff5252;
+}
+
+.finish-quiz-button {
+  background-color: #4a4a4a;
+  color: #dbdbdb;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.finish-quiz-button:hover {
+  background-color: #dbdbdb;
+  color: #4a4a4a;
+}
+
+.correct-id-info {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.correct-id-info p {
+  margin: 0;
+  color: #495057;
+  font-size: 14px;
 } 

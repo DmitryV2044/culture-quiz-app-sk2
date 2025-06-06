@@ -8,6 +8,8 @@ const Quiz = () => {
   const [showScore, setShowScore] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showReportButton, setShowReportButton] = useState(false);
+  const [showCorrectId, setShowCorrectId] = useState(false);
 
   // Функция для перемешивания массива (алгоритм Фишера-Йейтса)
   const shuffleArray = (array) => {
@@ -29,9 +31,12 @@ const Quiz = () => {
 
         // Преобразуем данные в формат, который нам нужен
         const formattedQuestions = selectedQuestions.map((item, index) => {
-          // Создаем массив всех возможных ответов, исключая текущий
+          // Создаем массив всех возможных ответов, исключая текущий и все предыдущие использованные авторы
+          const usedAuthors = new Set();
+          selectedQuestions.slice(0, index).forEach(q => usedAuthors.add(q.author));
+          
           const allAnswers = data
-            .filter(d => d.author !== item.author)
+            .filter(d => d.author !== item.author && !usedAuthors.has(d.author))
             .map(d => d.author);
           
           // Выбираем 3 случайных неправильных ответа
@@ -42,7 +47,7 @@ const Quiz = () => {
 
           return {
             image: item.image,
-            question: "Кто автор этой картины?",
+            question: "Кто автор этого произведения?",
             options: options,
             correct_answer: item.author,
             correct_id: item.id,
@@ -70,13 +75,21 @@ const Quiz = () => {
     
     if (answer === questions[currentQuestion].correct_answer) {
       setScore(score + 1);
+      setShowReportButton(false);
+    } else {
+      setShowReportButton(true);
     }
+  };
+
+  const handleReportError = () => {
+    setShowCorrectId(true);
   };
 
   const handleContinue = () => {
     if (currentQuestion + 1 < questions.length) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
+      setShowReportButton(false);
     } else {
       setShowScore(true);
     }
@@ -87,6 +100,12 @@ const Quiz = () => {
     setScore(0);
     setShowScore(false);
     setSelectedAnswer(null);
+  };
+
+  const handleFinishQuiz = () => {
+    if (window.confirm('Вы уверены, что хотите завершить тест?')) {
+      setShowScore(true);
+    }
   };
 
   if (isLoading) {
@@ -117,6 +136,12 @@ const Quiz = () => {
       <div className="question-section">
         <div className="question-count">
           <span>Вопрос {currentQuestion + 1}</span>/{questions.length}
+          <button 
+            className="finish-quiz-button"
+            onClick={handleFinishQuiz}
+          >
+            Завершить тест
+          </button>
         </div>
         <div className="question-image">
           <img 
@@ -150,10 +175,21 @@ const Quiz = () => {
         ))}
         {selectedAnswer !== null && (
           <>
-            {selectedAnswer === currentQuestionData.correct_answer && (
-              <div className="correct-answer-info">
-                <p>Название: {currentQuestionData.caption}</p>
-                <p>Датировка: {currentQuestionData.date}</p>
+            <div className={`answer-info ${selectedAnswer === currentQuestionData.correct_answer ? 'correct' : 'incorrect'}`}>
+              <p>Название: {currentQuestionData.caption}</p>
+              <p>Датировка: {currentQuestionData.date}</p>
+            </div>
+            {showReportButton && (
+              <button 
+                className="report-button"
+                onClick={handleReportError}
+              >
+                Ошибка в тесте?
+              </button>
+            )}
+            {showCorrectId && (
+              <div className="correct-id-info">
+                <p>ID правильного ответа: {currentQuestionData.correct_id}, отправь скрин куда следует</p>
               </div>
             )}
             <button 
@@ -165,6 +201,9 @@ const Quiz = () => {
           </>
         )}
       </div>
+      <footer className="quiz-footer">
+        <p>Design by: Alex Busy</p>
+      </footer>
     </div>
   );
 };
