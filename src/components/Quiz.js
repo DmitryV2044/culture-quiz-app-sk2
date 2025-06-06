@@ -221,6 +221,7 @@ const Quiz = () => {
         )}
       </div>
       <footer className="quiz-footer">
+        <p>Data by: Veronika Kirillova</p>
         <p>Design by: Alex Busy</p>
       </footer>
     </div>
