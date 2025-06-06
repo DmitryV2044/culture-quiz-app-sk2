@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import './Quiz.css';
 
 const Quiz = () => {
+  const { mode } = useParams();
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
@@ -10,6 +12,7 @@ const Quiz = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showReportButton, setShowReportButton] = useState(false);
   const [showCorrectId, setShowCorrectId] = useState(false);
+  const [dateRange, setDateRange] = useState({ min: 0, max: 0 });
 
   // Функция для перемешивания массива (алгоритм Фишера-Йейтса)
   const shuffleArray = (array) => {
@@ -21,43 +24,58 @@ const Quiz = () => {
   };
 
   useEffect(() => {
-    // Загрузка вопросов из JSON файла
     fetch('/quiz_data.json')
       .then(response => response.json())
       .then(data => {
-        // Выбираем 25 случайных картин
         const shuffledData = shuffleArray([...data]);
         const selectedQuestions = shuffledData.slice(0, 25);
 
-        // Преобразуем данные в формат, который нам нужен
         const formattedQuestions = selectedQuestions.map((item, index) => {
-          // Создаем массив всех возможных ответов, исключая текущий и все предыдущие использованные авторы
-          const usedAuthors = new Set();
-          selectedQuestions.slice(0, index).forEach(q => usedAuthors.add(q.author));
-          
-          const allAnswers = data
-            .filter(d => d.author !== item.author && !usedAuthors.has(d.author))
-            .map(d => d.author);
-          
-          // Выбираем 3 случайных неправильных ответа
-          const wrongAnswers = shuffleArray([...allAnswers]).slice(0, 3);
-          
-          // Создаем массив всех вариантов ответов и перемешиваем его
-          const options = shuffleArray([...wrongAnswers, item.author]);
+          if (mode === 'date') {
+            // Get all unique dates from the data
+            const allDates = [...new Set(data.map(d => d.date))];
+            const wrongDates = allDates
+              .filter(d => d !== item.date)
+              .slice(0, 3);
+            
+            const options = shuffleArray([...wrongDates, item.date]);
 
-          return {
-            image: item.image,
-            question: "Кто автор этого произведения?",
-            options: options,
-            correct_answer: item.author,
-            correct_id: item.id,
-            caption: item.caption,
-            date: item.date,
-            option_ids: options.map(opt => {
-              const matchingItem = data.find(d => d.author === opt);
-              return matchingItem ? matchingItem.id : null;
-            })
-          };
+            return {
+              image: item.image,
+              question: "Когда было создано это произведение?",
+              options: options,
+              correct_answer: item.date,
+              correct_id: item.id,
+              caption: item.caption,
+              date: item.date,
+              author: item.author
+            };
+          } else {
+            // Original author mode logic
+            const usedAuthors = new Set();
+            selectedQuestions.slice(0, index).forEach(q => usedAuthors.add(q.author));
+            
+            const allAnswers = data
+              .filter(d => d.author !== item.author && !usedAuthors.has(d.author))
+              .map(d => d.author);
+            
+            const wrongAnswers = shuffleArray([...allAnswers]).slice(0, 3);
+            const options = shuffleArray([...wrongAnswers, item.author]);
+
+            return {
+              image: item.image,
+              question: "Кто автор этого произведения?",
+              options: options,
+              correct_answer: item.author,
+              correct_id: item.id,
+              caption: item.caption,
+              date: item.date,
+              option_ids: options.map(opt => {
+                const matchingItem = data.find(d => d.author === opt);
+                return matchingItem ? matchingItem.id : null;
+              })
+            };
+          }
         });
         setQuestions(formattedQuestions);
         setIsLoading(false);
@@ -66,7 +84,7 @@ const Quiz = () => {
         console.error('Error loading questions:', error);
         setIsLoading(false);
       });
-  }, []);
+  }, [mode]);
 
   const handleAnswerClick = (answer) => {
     if (!questions[currentQuestion]) return;
@@ -145,7 +163,7 @@ const Quiz = () => {
         </div>
         <div className="question-image">
           <img 
-            src={currentQuestionData.image} 
+            src={`/${currentQuestionData.image}`} 
             alt="Question"
             className="artwork-image"
           />
@@ -178,6 +196,7 @@ const Quiz = () => {
             <div className={`answer-info ${selectedAnswer === currentQuestionData.correct_answer ? 'correct' : 'incorrect'}`}>
               <p>Название: {currentQuestionData.caption}</p>
               <p>Датировка: {currentQuestionData.date}</p>
+              {mode === 'date' && <p>Автор: {currentQuestionData.author}</p>}
             </div>
             {showReportButton && (
               <button 
