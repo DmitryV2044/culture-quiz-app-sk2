@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'r
 import './App.css';
 import Quiz from './components/Quiz';
 import ModeSelection from './components/ModeSelection';
+import Gallery from './components/Gallery';
 
 function Header() {
   const navigate = useNavigate();
@@ -10,6 +11,9 @@ function Header() {
   return (
     <header className="App-header">
       <h1 onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>АВТОРДАТИРОВКА</h1>
+      <nav>
+        <button onClick={() => navigate('/gallery')} className="nav-button">Галерея</button>
+      </nav>
     </header>
   );
 }
@@ -23,6 +27,7 @@ function App() {
           <Routes>
             <Route path="/" element={<ModeSelection />} />
             <Route path="/quiz/:mode" element={<Quiz />} />
+            <Route path="/gallery" element={<Gallery />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
